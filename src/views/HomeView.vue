@@ -57,11 +57,23 @@ onMounted(() => getMovies())
 
 <template>
   <main>
-    {{ totalMovies }}
-    <div v-if="movies.length > 0">
-      <div v-for="movie in movies" :key="movie.id" class="mb-2">
-        <div class="md:text-xl font-semibold"> {{ movie.title }}, <span class="text-gray-600 text-sm">{{ movie.year }}</span> </div>
-      </div>
+    <div class="mb-6">Total Movies: {{ totalMovies }}</div>
+    <div v-if="movies.length > 0" class="my-8">
+      <table class="table-auto rounded-md overflow-hidden shadow-md ring-1 ring-gray-300">
+        <thead class="bg-gray-100 text-left text-gray-900">
+          <tr class="border-b border-gray-300">
+            <th class="pl-6 pr-3 py-3">Title</th>
+            <th class="pl-3 pr-6 py-3">Year</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-y-gray-200">
+          <tr v-for="movie in movies" :key="movie.id" class="even: bg-gray-50 odd:bg-white">
+            <td class="pl-6 pr-3 py-3 font-semibold">{{ movie.title }}</td>
+            <td class="pl-3 pr-6 py-3">{{ movie.year }}</td>
+          </tr>
+
+        </tbody>
+      </table>
     </div>
     <div v-if="isLoading" class="mt-4 flex gap-4 items-center">
       <svg class="w-8 h-8 text-gray-200 animate-spin fill-blue-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
