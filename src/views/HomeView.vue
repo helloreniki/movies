@@ -1,6 +1,9 @@
 <script setup>
 import axios from 'axios'
 import { onMounted, ref, computed } from 'vue'
+import Paginator from 'primevue/paginator';
+import 'primevue/resources/themes/lara-light-teal/theme.css'
+
 
 const apiKey = import.meta.env.VITE_OMDB_API
 const movies = ref([])
@@ -12,6 +15,10 @@ const query = ref('foo')
 const page = ref(1)
 const totalMovies = ref('')
 const totalPages = computed(() => Math.ceil(totalMovies.value / 10))
+
+const paginatedPage = ref(1)
+const paginatedMovies = ref([])
+const perPage = ref(20)
 
 async function getMovies() {
   isLoading.value = true
@@ -33,6 +40,8 @@ async function getMovies() {
       })
     });
 
+    paginatedMovies.value = movies.value.slice(0, perPage.value)
+
     totalMovies.value = totalResults
 
     loadMore()
@@ -51,6 +60,13 @@ function loadMore() {
   }
 }
 
+function updatePage(e) {
+  console.log(e)
+  const first = e.first
+  const last = first + e.rows
+  paginatedMovies.value = movies.value.slice(first, last)
+}
+
 onMounted(() => getMovies())
 
 </script>
@@ -58,8 +74,8 @@ onMounted(() => getMovies())
 <template>
   <main>
     <div class="mb-6">Total Movies: {{ totalMovies }}</div>
-    <div v-if="movies.length > 0" class="my-8">
-      <table class="table-auto rounded-md overflow-hidden shadow-md ring-1 ring-gray-300">
+    <div v-if="movies.length > 0" class="my-12">
+      <table class="max-w-4xl w-full rounded-md overflow-hidden shadow-md ring-1 ring-gray-300">
         <thead class="bg-gray-100 text-left text-gray-900">
           <tr class="border-b border-gray-300">
             <th class="pl-6 pr-3 py-3">Title</th>
@@ -67,12 +83,14 @@ onMounted(() => getMovies())
           </tr>
         </thead>
         <tbody class="divide-y divide-y-gray-200">
-          <tr v-for="movie in movies" :key="movie.id" class="even: bg-gray-50 odd:bg-white">
+          <tr v-for="movie in paginatedMovies" :key="movie.id" class="even: bg-gray-50 odd:bg-white">
             <td class="pl-6 pr-3 py-3 font-semibold">{{ movie.title }}</td>
             <td class="pl-3 pr-6 py-3">{{ movie.year }}</td>
           </tr>
-
         </tbody>
+        <caption class="caption-bottom mt-8 ml-0">
+          <Paginator v-model:first="paginatedPage" :rows="perPage" :totalRecords="Number(totalMovies)" :rowsPerPageOptions="[10, 20, 30]" @page="updatePage($event)"></Paginator>
+        </caption>
       </table>
     </div>
     <div v-if="isLoading" class="mt-4 flex gap-4 items-center">
