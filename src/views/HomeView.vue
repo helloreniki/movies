@@ -6,7 +6,7 @@ import { useMoviesStore } from '@/stores/movies'
 import { storeToRefs } from 'pinia';
 
 const moviesStore = useMoviesStore()
-const { paginatedMovies, error, isLoading, totalMovies, perPage, paginatedPage, query } = storeToRefs(moviesStore)
+const { paginatedMovies, error, isLoading, totalMovies, perPage, paginatedPage, queryTitle, queryYear } = storeToRefs(moviesStore)
 const { getMovies, updatePage } = moviesStore
 
 onMounted(() => getMovies())
@@ -15,7 +15,11 @@ onMounted(() => getMovies())
 
 <template>
   <main>
-    <input type="text" v-model="query" class="shadow-md mb-10 text-xl px-4 py-2 rounded-lg border-0 ring-1 ring-gray-300 focus:outline-none focus:ring-2 focus:ring-teal-400/80 placeholder:text-sm w-full max-w-3xl" placeholder="Search for movies by title..."/>
+    {{ queryTitle + queryYear }}
+    <div class="flex flex-col md:flex-row gap-4 max-w-5xl w-full mb-12">
+      <input type="text" v-model="queryTitle" class="md:w-3/5 shadow-md mb-10 text-xl px-4 py-2 rounded-lg border-0 ring-1 ring-gray-300 focus:outline-none focus:ring-2 focus:ring-teal-400/80 placeholder:text-sm" placeholder="Search by title..."/>
+      <input type="number" v-model="queryYear" class="md:2/5 shadow-md mb-10 text-xl px-4 py-2 rounded-lg border-0 ring-1 ring-gray-300 focus:outline-none focus:ring-2 focus:ring-teal-400/80 placeholder:text-sm" placeholder="Search by year..."/>
+    </div>
     <div class="mb-6">Total Movies: {{ totalMovies }} paginatedMovied: {{ paginatedMovies.length }}</div>
     <div v-if="paginatedMovies.length > 0" class="my-12">
       <table class="max-w-4xl w-full rounded-md overflow-hidden shadow-md ring-1 ring-gray-300">
@@ -43,6 +47,7 @@ onMounted(() => getMovies())
       </svg>
       <div>Loading...</div>
     </div>
+    <p v-if="queryTitle == ''">Your search input is empty. Please fill something in.</p>
     <div v-if="error" class="mt-4">{{ error }}</div>
   </main>
 </template>
