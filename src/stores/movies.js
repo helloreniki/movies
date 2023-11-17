@@ -1,6 +1,7 @@
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { defineStore } from 'pinia'
 import axios from 'axios'
+import { refDebounced } from '@vueuse/core'
 
 export const useMoviesStore = defineStore('movies', () => {
   const apiKey = import.meta.env.VITE_OMDB_API
@@ -8,7 +9,6 @@ export const useMoviesStore = defineStore('movies', () => {
   const error = ref()
   const isLoading = ref(false)
 
-  // shouldn't be empty -> todo: show error message if empty
   const query = ref('foo')
   const page = ref(1)
   const totalMovies = ref('')
@@ -18,8 +18,11 @@ export const useMoviesStore = defineStore('movies', () => {
   const paginatedMovies = ref([])
   const perPage = ref(20)
 
+  const queryDebounced = refDebounced(query, 200)
+
   async function getMovies() {
     isLoading.value = true
+    error.value = null
 
     try {
       const { data } = await axios.get(`http://www.omdbapi.com/?apikey=${apiKey}&s=${query.value}&page=${page.value}`)
@@ -42,7 +45,11 @@ export const useMoviesStore = defineStore('movies', () => {
 
       loadMore()
 
-      paginatedMovies.value = movies.value.slice(0, perPage.value)
+      if(perPage.value < movies.value.length){
+        paginatedMovies.value = movies.value.slice(0, perPage.value)
+      } else {
+        paginatedMovies.value = movies.value
+      }
 
     } catch(err) {
         error.value = err.message;
@@ -65,6 +72,16 @@ export const useMoviesStore = defineStore('movies', () => {
     paginatedMovies.value = movies.value.slice(first, last)
   }
 
-  return { paginatedMovies, error, isLoading, getMovies, totalMovies, perPage, paginatedPage, updatePage }
+  // on every keystroke
+  watch(queryDebounced, () => {
+    movies.value = [];
+    paginatedMovies.value = [];
+
+    console.log(movies.value.length)
+    console.log('paginated', paginatedMovies.value.length)
+    getMovies()
+  })
+
+  return { paginatedMovies, error, isLoading, getMovies, totalMovies, perPage, paginatedPage, updatePage, query }
 
 })

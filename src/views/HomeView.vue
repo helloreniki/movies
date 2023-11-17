@@ -6,7 +6,7 @@ import { useMoviesStore } from '@/stores/movies'
 import { storeToRefs } from 'pinia';
 
 const moviesStore = useMoviesStore()
-const { paginatedMovies, error, isLoading, totalMovies, perPage, paginatedPage } = storeToRefs(moviesStore)
+const { paginatedMovies, error, isLoading, totalMovies, perPage, paginatedPage, query } = storeToRefs(moviesStore)
 const { getMovies, updatePage } = moviesStore
 
 onMounted(() => getMovies())
@@ -15,7 +15,8 @@ onMounted(() => getMovies())
 
 <template>
   <main>
-    <div class="mb-6">Total Movies: {{ totalMovies }}</div>
+    <input type="text" v-model="query" class="shadow-md mb-10 text-xl px-4 py-2 rounded-lg border-0 ring-1 ring-gray-300 focus:outline-none focus:ring-2 focus:ring-teal-400/80 placeholder:text-sm w-full max-w-3xl" placeholder="Search for movies by title..."/>
+    <div class="mb-6">Total Movies: {{ totalMovies }} paginatedMovied: {{ paginatedMovies.length }}</div>
     <div v-if="paginatedMovies.length > 0" class="my-12">
       <table class="max-w-4xl w-full rounded-md overflow-hidden shadow-md ring-1 ring-gray-300">
         <thead class="bg-gray-100 text-left text-gray-900">
