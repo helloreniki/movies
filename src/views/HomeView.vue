@@ -1,71 +1,13 @@
 <script setup>
-import axios from 'axios'
-import { onMounted, ref, computed } from 'vue'
+import { onMounted } from 'vue'
 import Paginator from 'primevue/paginator';
 import 'primevue/resources/themes/lara-light-teal/theme.css'
+import { useMoviesStore } from '@/stores/movies'
+import { storeToRefs } from 'pinia';
 
-
-const apiKey = import.meta.env.VITE_OMDB_API
-const movies = ref([])
-const error = ref()
-const isLoading = ref(false)
-
-// shouldn't be empty -> todo: show error message if empty
-const query = ref('foo')
-const page = ref(1)
-const totalMovies = ref('')
-const totalPages = computed(() => Math.ceil(totalMovies.value / 10))
-
-const paginatedPage = ref(1)
-const paginatedMovies = ref([])
-const perPage = ref(20)
-
-async function getMovies() {
-  isLoading.value = true
-
-  try {
-    const { data } = await axios.get(`http://www.omdbapi.com/?apikey=${apiKey}&s=${query.value}&page=${page.value}`)
-    // console.log(data)
-    const { Search, totalResults, Error } = data
-
-    // if Response false
-    if(Error) { error.value = Error; return }
-
-    // if Response true
-    Search.map(element => {
-      movies.value.push({
-        "id": element.imdbID,
-        "title": element.Title,
-        "year": element.Year
-      })
-    });
-
-    paginatedMovies.value = movies.value.slice(0, perPage.value)
-
-    totalMovies.value = totalResults
-
-    loadMore()
-
-  } catch(err) {
-      error.value = err.message;
-  } finally {
-      isLoading.value = false
-  }
-}
-
-function loadMore() {
-  if(page.value < totalPages.value){
-    page.value++
-    getMovies()
-  }
-}
-
-function updatePage(e) {
-  console.log(e)
-  const first = e.first
-  const last = first + e.rows
-  paginatedMovies.value = movies.value.slice(first, last)
-}
+const moviesStore = useMoviesStore()
+const { paginatedMovies, error, isLoading, totalMovies, perPage, paginatedPage } = storeToRefs(moviesStore)
+const { getMovies, updatePage } = moviesStore
 
 onMounted(() => getMovies())
 
@@ -74,7 +16,7 @@ onMounted(() => getMovies())
 <template>
   <main>
     <div class="mb-6">Total Movies: {{ totalMovies }}</div>
-    <div v-if="movies.length > 0" class="my-12">
+    <div v-if="paginatedMovies.length > 0" class="my-12">
       <table class="max-w-4xl w-full rounded-md overflow-hidden shadow-md ring-1 ring-gray-300">
         <thead class="bg-gray-100 text-left text-gray-900">
           <tr class="border-b border-gray-300">
