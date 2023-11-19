@@ -6,33 +6,51 @@ import { useMoviesStore } from '@/stores/movies'
 import { storeToRefs } from 'pinia';
 
 const moviesStore = useMoviesStore()
-const { paginatedMovies, error, isLoading, totalMovies, perPage, paginatedPage, queryTitle, queryYear } = storeToRefs(moviesStore)
+const { paginatedMovies, error, isLoading, totalMovies, perPage, paginatedPage, queryTitle, queryYear, selectedGenre } = storeToRefs(moviesStore)
 const { getMovies, updatePage } = moviesStore
 
-onMounted(() => getMovies())
+const genres = [
+    { "id": 1, "name": "Drama"},
+    { "id": 2, "name": "Action"},
+    { "id": 3, "name": "Comedy"},
+    { "id": 4, "name": "Music"},
+    { "id": 5, "name": "Short"},
+    { "id": 6, "name": "Documentary"},
+    { "id": 7, "name": "Sci-Fi"},
+    { "id": 8, "name": "Crime"},
+]
 
+onMounted(() => getMovies())
 </script>
 
 <template>
   <main>
-    {{ queryTitle + queryYear }}
-    <div class="flex flex-col md:flex-row gap-4 max-w-5xl w-full mb-12">
-      <input type="text" v-model="queryTitle" class="md:w-3/5 shadow-md mb-10 text-xl px-4 py-2 rounded-lg border-0 ring-1 ring-gray-300 focus:outline-none focus:ring-2 focus:ring-teal-400/80 placeholder:text-sm" placeholder="Search by title..."/>
-      <input type="number" v-model="queryYear" class="md:2/5 shadow-md mb-10 text-xl px-4 py-2 rounded-lg border-0 ring-1 ring-gray-300 focus:outline-none focus:ring-2 focus:ring-teal-400/80 placeholder:text-sm" placeholder="Search by year..."/>
+    {{ queryTitle + queryYear + selectedGenre }}
+    <div class="flex flex-col md:flex-row items-center gap-x-4 max-w-5xl w-full mb-12 text-xl">
+      <input type="text" v-model="queryTitle" class="md:w-3/5 shadow-md px-4 py-2 rounded-lg border-0 ring-1 ring-gray-300 focus:outline-none focus:ring-2 focus:ring-teal-400/80 placeholder:text-sm" placeholder="Search by title..."/>
+      <input type="number" v-model="queryYear" class="md:2/5 shadow-md px-4 py-2 rounded-lg border-0 ring-1 ring-gray-300 focus:outline-none focus:ring-2 focus:ring-teal-400/80 placeholder:text-sm" placeholder="Search by year..."/>
+      <select v-model="selectedGenre" class="shadow-md px-4 py-2 rounded-lg border-0 ring-1 ring-gray-300 focus:outline-none focus:ring-2 focus:ring-teal-400/80">
+        <option value="">Filter by genre </option>
+        <option value="">All</option>
+        <option v-for="genre in genres" :key="genre.id" :value="genre.name">{{ genre.name }}</option>
+        <!-- <option v-for="genre in genresAll" :key="genre.id" :value="genre.name">{{ genre.id }}</option> -->
+      </select>
     </div>
-    <div class="mb-6">Total Movies: {{ totalMovies }} paginatedMovied: {{ paginatedMovies.length }}</div>
+    <div class="mb-6">Total Movies: {{ totalMovies }} paginatedMovies: {{ paginatedMovies.length }}</div>
     <div v-if="paginatedMovies.length > 0" class="my-12">
       <table class="max-w-4xl w-full rounded-md overflow-hidden shadow-md ring-1 ring-gray-300">
         <thead class="bg-gray-100 text-left text-gray-900">
           <tr class="border-b border-gray-300">
             <th class="pl-6 pr-3 py-3">Title</th>
             <th class="pl-3 pr-6 py-3">Year</th>
+            <th class="pl-3 pr-6 py-3">Genre</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-y-gray-200">
           <tr v-for="movie in paginatedMovies" :key="movie.id" class="even: bg-gray-50 odd:bg-white">
             <td class="pl-6 pr-3 py-3 font-semibold">{{ movie.title }}</td>
             <td class="pl-3 pr-6 py-3">{{ movie.year }}</td>
+            <td class="pl-3 pr-6 py-3">{{ movie.genre }}</td>
           </tr>
         </tbody>
         <caption class="caption-bottom mt-8 ml-0">
