@@ -1,13 +1,15 @@
 <script setup>
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import Paginator from 'primevue/paginator';
 import 'primevue/resources/themes/lara-light-teal/theme.css'
 import { useMoviesStore } from '@/stores/movies'
 import { storeToRefs } from 'pinia';
+import Rating from 'primevue/rating';
+import { useStorage } from '@vueuse/core'
 
 const moviesStore = useMoviesStore()
-const { paginatedMovies, error, isLoading, totalMovies, perPage, paginatedPage, queryTitle, queryYear, selectedGenre } = storeToRefs(moviesStore)
-const { getMovies, updatePage } = moviesStore
+const { paginatedMovies, error, isLoading, totalMovies, perPage, paginatedPage, queryTitle, queryYear, selectedGenre, selectedSortOption, openedRating } = storeToRefs(moviesStore)
+const { getMovies, updatePage, addRating } = moviesStore
 
 const genres = [
     { "id": 1, "name": "Drama"},
@@ -20,10 +22,29 @@ const genres = [
     { "id": 8, "name": "Crime"},
 ]
 
+const sortOptions = [
+    { "id": 1, "field": "title", "direction": "asc"},
+    { "id": 2, "field": "title", "direction": "desc"},
+    { "id": 3, "field": "rating", "direction": "asc"},
+    { "id": 4, "field": "rating", "direction": "desc"},
+    { "id": 5, "field": "year", "direction": "asc"},
+    { "id": 6, "field": "year", "direction": "desc"},
+  ]
+// const your_rating = ref(null)
+// const openedRating = ref(false)
+// function addRating(value, movie){
+//   // console.log(value)
+//   // console.log('m', movie )
+//   movie.your_rating = value
+//   movie.imdb_rating = (movie.imdb_rating + value*2) / 2
+//   useStorage(movie.id, movie.your_rating)
+// }
+
 onMounted(() => getMovies())
 </script>
 
 <template>
+
   <main>
     {{ queryTitle + queryYear + selectedGenre }}
     <div class="flex flex-col md:flex-row items-center gap-x-4 max-w-5xl w-full mb-12 text-xl">
@@ -34,6 +55,10 @@ onMounted(() => getMovies())
         <option value="">All</option>
         <option v-for="genre in genres" :key="genre.id" :value="genre.name">{{ genre.name }}</option>
         <!-- <option v-for="genre in genresAll" :key="genre.id" :value="genre.name">{{ genre.id }}</option> -->
+      </select>
+      <select v-model="selectedSortOption" class="shadow-md px-4 py-2 rounded-lg border-0 ring-1 ring-gray-300 focus:outline-none focus:ring-2 focus:ring-teal-400/80">
+        <option value="">SortBy</option>
+        <option v-for="sortOption in sortOptions" :key="sortOption.id" :value="sortOption">{{ sortOption.field + ' ' + sortOption.direction}}</option>
       </select>
     </div>
     <div class="mb-6">Total Movies: {{ totalMovies }} paginatedMovies: {{ paginatedMovies.length }}</div>
@@ -48,7 +73,19 @@ onMounted(() => getMovies())
         </thead>
         <tbody class="divide-y divide-y-gray-200">
           <tr v-for="movie in paginatedMovies" :key="movie.id" class="even: bg-gray-50 odd:bg-white">
-            <td class="pl-6 pr-3 py-3 font-semibold">{{ movie.title }}</td>
+            <td class="pl-6 pr-3 py-3 ">
+              <div class="font-semibold"> {{ movie.title }} </div>
+              <div class="text-sm text-gray-500 mt-1"> Rating: {{ movie.imdb_rating }} / 10</div>
+              <div class="flex gap-5 items-baseline">
+                <div class="text-sm text-gray-500 mt-1"> Your Rating: </div>
+                <div v-if="movie.your_rating">{{ movie.your_rating }}</div>
+                <div v-else @click="openedRating = true" class="bg-gray-100 hover:bg-gray-200 px-4 py-2 font-semibold rounded-lg cursor-pointer">Rate</div>
+                <div v-if="movie.your_rating || openedRating">
+                  <Rating v-model="movie.your_rating" :cancel="false" @update:modelValue="addRating($event, movie)"></Rating>
+                </div>
+
+              </div>
+            </td>
             <td class="pl-3 pr-6 py-3">{{ movie.year }}</td>
             <td class="pl-3 pr-6 py-3">{{ movie.genre }}</td>
           </tr>

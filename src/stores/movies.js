@@ -2,6 +2,8 @@ import { ref, computed, watch } from 'vue'
 import { defineStore } from 'pinia'
 import axios from 'axios'
 import { refDebounced } from '@vueuse/core'
+import { useStorage } from '@vueuse/core'
+
 
 export const useMoviesStore = defineStore('movies', () => {
   const apiKey = import.meta.env.VITE_OMDB_API
@@ -13,10 +15,27 @@ export const useMoviesStore = defineStore('movies', () => {
   const queryYear = ref('')
   const page = ref(1)
 
-  const selectedGenre = ref(null)
+  // selectedGenre empty string, if null it won't filter if nth selected (includes('') vs includes(null))
+  const selectedGenre = ref('')
+  const selectedSortOption = ref('')
   const filteredMovies = computed(() => {
-    return selectedGenre.value
-      ? movies.value.filter(movie => movie.genre.includes(selectedGenre.value))
+    return (selectedGenre.value || selectedSortOption.value)
+      ? movies.value
+          .filter(movie => movie.genre.includes(selectedGenre.value))
+          .sort((a, b) => {
+            if(selectedSortOption.value.field == 'title'){
+              console.log('sorting')
+              if(selectedSortOption.value.direction == 'asc'){
+
+                if (a.title < b.title) { return -1 }
+                else return 1
+              } else {
+                if (a.title < b.title) { return 1 }
+                else return -1
+              }
+            }
+          })
+
       : movies.value
   })
 
@@ -31,6 +50,7 @@ export const useMoviesStore = defineStore('movies', () => {
   const queryYearDebounced = refDebounced(queryYear, 200)
 
   const genre = ref('')
+  const imdb_rating = ref('')
 
   async function getMovies() {
     isLoading.value = true
@@ -51,13 +71,19 @@ export const useMoviesStore = defineStore('movies', () => {
           "id": element.imdbID,
           "title": element.Title,
           "year": element.Year,
-          "genre": genre.value
+          "genre": genre.value,
+          'imdb_rating': imdb_rating.value,
+          'your_rating': useStorage(element.imdbID, null)
         })
       });
+      console.log(movies.value)
 
       totalMovies.value = totalResults
 
-      loadMore()
+      // max 100 results
+      if(page.value <= 10){
+        loadMore()
+      }
 
     } catch(err) {
         error.value = err.message;
@@ -77,7 +103,9 @@ export const useMoviesStore = defineStore('movies', () => {
   async function getOneMovie(imdbID) {
     try {
       const { data } = await axios.get(`http://www.omdbapi.com/?apikey=${apiKey}&i=${imdbID}`)
+      // console.log(data)
       genre.value = data.Genre
+      imdb_rating.value = data.imdbRating
     } catch(err) {
         error.value = err.message;
     } finally {
@@ -138,6 +166,14 @@ export const useMoviesStore = defineStore('movies', () => {
 
   // console.log(genresAll.value)
 
-  return { paginatedMovies, error, isLoading, getMovies, totalMovies, perPage, paginatedPage, updatePage, queryTitle, queryYear, selectedGenre }
+  const openedRating = ref(false)
+  function addRating(value, movie){
+    movie.your_rating = value
+    movie.imdb_rating = ((Number(movie.imdb_rating) + value*2) / 2).toFixed(2)
+    useStorage(movie.id, movie.your_rating)
+  }
+
+
+  return { paginatedMovies, error, isLoading, getMovies, totalMovies, perPage, paginatedPage, updatePage, queryTitle, queryYear, selectedGenre, selectedSortOption, openedRating, addRating }
 
 })
