@@ -73,7 +73,8 @@ export const useMoviesStore = defineStore('movies', () => {
           "year": element.Year,
           "genre": genre.value,
           'imdb_rating': imdb_rating.value,
-          'your_rating': Number(useStorage(element.imdbID, null).value)
+          'your_rating': Number(useStorage(element.imdbID, null).value),
+          'review': useStorage('review' + element.imdbID, null).value
         })
       });
       console.log(movies.value)

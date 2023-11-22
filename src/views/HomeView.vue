@@ -5,7 +5,8 @@ import 'primevue/resources/themes/lara-light-teal/theme.css'
 import { useMoviesStore } from '@/stores/movies'
 import { storeToRefs } from 'pinia';
 import Rating from 'primevue/rating';
-import { useStorage } from '@vueuse/core'
+import ReviewCreate from '@/components/ReviewCreate.vue'
+import ReviewShow from '@/components/ReviewShow.vue'
 
 const moviesStore = useMoviesStore()
 const { paginatedMovies, error, isLoading, totalMovies, perPage, paginatedPage, queryTitle, queryYear, selectedGenre, selectedSortOption, openedRating } = storeToRefs(moviesStore)
@@ -30,15 +31,7 @@ const sortOptions = [
     { "id": 5, "field": "year", "direction": "asc"},
     { "id": 6, "field": "year", "direction": "desc"},
   ]
-// const your_rating = ref(null)
-// const openedRating = ref(false)
-// function addRating(value, movie){
-//   // console.log(value)
-//   // console.log('m', movie )
-//   movie.your_rating = value
-//   movie.imdb_rating = (movie.imdb_rating + value*2) / 2
-//   useStorage(movie.id, movie.your_rating)
-// }
+
 
 onMounted(() => getMovies())
 </script>
@@ -63,12 +56,13 @@ onMounted(() => getMovies())
     </div>
     <div class="mb-6">Total Movies: {{ totalMovies }} paginatedMovies: {{ paginatedMovies.length }}</div>
     <div v-if="paginatedMovies.length > 0" class="my-12">
-      <table class="max-w-4xl w-full rounded-md overflow-hidden shadow-md ring-1 ring-gray-300">
+      <table class="max-w-6xl w-full rounded-md overflow-hidden shadow-md ring-1 ring-gray-300">
         <thead class="bg-gray-100 text-left text-gray-900">
           <tr class="border-b border-gray-300">
             <th class="pl-6 pr-3 py-3">Title</th>
             <th class="pl-3 pr-6 py-3">Year</th>
             <th class="pl-3 pr-6 py-3">Genre</th>
+            <th class="pl-3 pr-6 py-3">Review</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-y-gray-200">
@@ -83,11 +77,14 @@ onMounted(() => getMovies())
                 <div v-if="movie.your_rating || openedRating">
                   <Rating v-model="movie.your_rating" :cancel="false" @update:modelValue="addRating($event, movie)"></Rating>
                 </div>
-
               </div>
             </td>
             <td class="pl-3 pr-6 py-3">{{ movie.year }}</td>
             <td class="pl-3 pr-6 py-3">{{ movie.genre }}</td>
+            <td class="pl-3 pr-6 py-3 flex gap-2">
+              <ReviewCreate :movie="movie" />
+              <ReviewShow v-if="movie.review" :movie="movie" />
+            </td>
           </tr>
         </tbody>
         <caption class="caption-bottom mt-8 ml-0">
