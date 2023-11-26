@@ -7,6 +7,7 @@ import { storeToRefs } from 'pinia';
 import Rating from 'primevue/rating';
 import ReviewCreate from '@/components/ReviewCreate.vue'
 import ReviewShow from '@/components/ReviewShow.vue'
+import ListCreate from '@/components/ListCreate.vue'
 
 const moviesStore = useMoviesStore()
 const { paginatedMovies, error, isLoading, totalMovies, perPage, paginatedPage, queryTitle, queryYear, selectedGenre, selectedSortOption, openedRating } = storeToRefs(moviesStore)
@@ -32,14 +33,12 @@ const sortOptions = [
     { "id": 6, "field": "year", "direction": "desc"},
   ]
 
-
 onMounted(() => getMovies())
 </script>
 
 <template>
 
   <main>
-    {{ queryTitle + queryYear + selectedGenre }}
     <div class="flex flex-col md:flex-row items-center gap-x-4 max-w-5xl w-full mb-12 text-xl">
       <input type="text" v-model="queryTitle" class="md:w-3/5 shadow-md px-4 py-2 rounded-lg border-0 ring-1 ring-gray-300 focus:outline-none focus:ring-2 focus:ring-teal-400/80 placeholder:text-sm" placeholder="Search by title..."/>
       <input type="number" v-model="queryYear" class="md:2/5 shadow-md px-4 py-2 rounded-lg border-0 ring-1 ring-gray-300 focus:outline-none focus:ring-2 focus:ring-teal-400/80 placeholder:text-sm" placeholder="Search by year..."/>
@@ -63,6 +62,7 @@ onMounted(() => getMovies())
             <th class="pl-3 pr-6 py-3">Year</th>
             <th class="pl-3 pr-6 py-3">Genre</th>
             <th class="pl-3 pr-6 py-3">Review</th>
+            <th></th>
           </tr>
         </thead>
         <tbody class="divide-y divide-y-gray-200">
@@ -84,6 +84,9 @@ onMounted(() => getMovies())
             <td class="pl-3 pr-6 py-3 flex gap-2">
               <ReviewCreate :movie="movie" />
               <ReviewShow v-if="movie.review" :movie="movie" />
+            </td>
+            <td class="pl-3 pr-6 py-3">
+              <ListCreate :movie="movie" />
             </td>
           </tr>
         </tbody>
