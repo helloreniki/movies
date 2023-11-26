@@ -1,13 +1,13 @@
 <template>
   <div>
-    <svg @click="visible = true" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+    <svg @click="visible = true" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 hover:text-teal-500">
       <path stroke-linecap="round" stroke-linejoin="round" d="M12 10.5v6m3-3H9m4.06-7.19l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z" />
     </svg>
     <Dialog v-model:visible="visible" modal header="Save to..." :style="{ width: '50rem' }">
       <div @click="showListCreate = true" v-if="showListCreate == false" class="text-sm mb-4 border rounded-lg shadow-md w-fit px-2 py-1 bg-gray-100">+ Create new list</div>
       <div action="" class="flex flex-col gap-4">
         <Dialog v-model:visible="showListCreate" class="bg-white text-sm" :style="{ width: '20rem' }" header="Create new list">
-          <input type="text" v-model="listName" class="text-sm shadow-md px-2 py-1 rounded-lg border ring-inset ring-gray-500 focus:border-0 focus:outline-none focus:ring-2 focus:ring-teal-400/80" />
+          <input type="text" v-model="listName" autofocus class="text-sm shadow-md px-2 py-1 rounded-lg border ring-inset ring-gray-500 focus:border-0 focus:outline-none focus:ring-2 focus:ring-teal-400/80" />
           <div @click="createList" class="border px-3 py-1 rounded-lg bg-gray-100 shadow-md mt-6 hover:bg-gray-200 w-fit">Create List</div>
         </Dialog>
         <div v-if="lists.length > 0">

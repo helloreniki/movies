@@ -25,12 +25,12 @@ const genres = [
 ]
 
 const sortOptions = [
-    { "id": 1, "field": "title", "direction": "asc"},
-    { "id": 2, "field": "title", "direction": "desc"},
-    { "id": 3, "field": "rating", "direction": "asc"},
-    { "id": 4, "field": "rating", "direction": "desc"},
-    { "id": 5, "field": "year", "direction": "asc"},
-    { "id": 6, "field": "year", "direction": "desc"},
+    { "id": 1, "field": "Title", "direction": "asc"},
+    { "id": 2, "field": "Title", "direction": "desc"},
+    { "id": 3, "field": "Rating", "direction": "asc"},
+    { "id": 4, "field": "Rating", "direction": "desc"},
+    { "id": 5, "field": "Year", "direction": "asc"},
+    { "id": 6, "field": "Year", "direction": "desc"},
   ]
 
 onMounted(() => getMovies())
@@ -53,16 +53,16 @@ onMounted(() => getMovies())
         <option v-for="sortOption in sortOptions" :key="sortOption.id" :value="sortOption">{{ sortOption.field + ' ' + sortOption.direction}}</option>
       </select>
     </div>
-    <div class="mb-6">Total Movies: {{ totalMovies }} paginatedMovies: {{ paginatedMovies.length }}</div>
+    <!-- <div class="mb-6">Total Movies: {{ totalMovies }}</div> -->
     <div v-if="paginatedMovies.length > 0" class="my-12">
-      <table class="max-w-6xl w-full rounded-md overflow-hidden shadow-md ring-1 ring-gray-300">
+      <table class="max-w-7xl w-full rounded-md overflow-hidden shadow-md ring-1 ring-gray-300">
         <thead class="bg-gray-100 text-left text-gray-900">
           <tr class="border-b border-gray-300">
             <th class="pl-6 pr-3 py-3">Title</th>
             <th class="pl-3 pr-6 py-3">Year</th>
             <th class="pl-3 pr-6 py-3">Genre</th>
             <th class="pl-3 pr-6 py-3">Review</th>
-            <th></th>
+            <th class="pl-3 pr-6 py-3">Save to list</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-y-gray-200">
@@ -73,19 +73,19 @@ onMounted(() => getMovies())
               <div class="flex gap-5 items-baseline">
                 <div class="text-sm text-gray-500 mt-1"> Your Rating: </div>
                 <div v-if="movie.your_rating">{{ movie.your_rating }}</div>
-                <div v-else @click="openedRating = true" class="bg-gray-100 hover:bg-gray-200 px-4 py-2 font-semibold rounded-lg cursor-pointer">Rate</div>
+                <div v-else @click="openedRating = !openedRating" class="bg-gray-100 hover:bg-gray-200 px-4 py-2 font-semibold rounded-lg cursor-pointer">Rate</div>
                 <div v-if="movie.your_rating || openedRating">
                   <Rating v-model="movie.your_rating" :cancel="false" @update:modelValue="addRating($event, movie)"></Rating>
                 </div>
               </div>
             </td>
-            <td class="pl-3 pr-6 py-3">{{ movie.year }}</td>
-            <td class="pl-3 pr-6 py-3">{{ movie.genre }}</td>
-            <td class="pl-3 pr-6 py-3 flex gap-2">
+            <td class="pl-3 pr-6 py-3 text-sm text-gray-800">{{ movie.year }}</td>
+            <td class="pl-3 pr-6 py-3 text-sm text-gray-700">{{ movie.genre }}</td>
+            <td class="pl-3 pr-6 py-3 flex gap-2 text-sm">
               <ReviewCreate :movie="movie" />
               <ReviewShow v-if="movie.review" :movie="movie" />
             </td>
-            <td class="pl-3 pr-6 py-3">
+            <td class="pl-3 pr-6 py-3 text-center cursor-pointer">
               <ListCreate :movie="movie" />
             </td>
           </tr>
