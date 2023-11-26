@@ -23,7 +23,7 @@ export const useMoviesStore = defineStore('movies', () => {
       ? movies.value
           .filter(movie => movie.genre.includes(selectedGenre.value))
           .sort((a, b) => {
-            if(selectedSortOption.value.field == 'title'){
+            if(selectedSortOption.value.field == 'Title'){
               console.log('sorting')
               if(selectedSortOption.value.direction == 'asc'){
 
@@ -32,6 +32,25 @@ export const useMoviesStore = defineStore('movies', () => {
               } else {
                 if (a.title < b.title) { return 1 }
                 else return -1
+              }
+            }
+          })
+          .sort((a, b) => {
+            if(selectedSortOption.value.field == 'Year'){
+              if(selectedSortOption.value.direction == 'asc'){
+                // 1960- (take only first 4, otherwise NaN)
+                return Number(a.year.slice(0,4)) - Number(b.year.slice(0,4))
+              } else {
+               return Number(b.year.slice(0,4)) - Number(a.year.slice(0,4))
+              }
+            }
+          })
+          .sort((a, b) => {
+            if(selectedSortOption.value.field == 'Rating'){
+              if(selectedSortOption.value.direction == 'asc'){
+                return Number(a.imdb_rating) - Number(b.imdb_rating)
+              } else {
+               return Number(b.imdb_rating) - Number(a.imdb_rating)
               }
             }
           })
@@ -58,8 +77,8 @@ export const useMoviesStore = defineStore('movies', () => {
 
     try {
       const { data } = await axios.get(`https://www.omdbapi.com/?apikey=${apiKey}&s=${queryTitle.value}&page=${page.value}&y=${queryYear.value}`)
-      // console.log(data)
       const { Search, totalResults, Error } = data
+      // console.log(Search)
 
       // if Response false
       if(Error) { error.value = Error; return }
@@ -82,7 +101,7 @@ export const useMoviesStore = defineStore('movies', () => {
       totalMovies.value = totalResults
 
       // max 100 results
-      if(page.value <= 10){
+      if(page.value < 10){
         loadMore()
       }
 
