@@ -32,7 +32,7 @@ const props = defineProps({movie: Object})
 const visible = ref(false)
 const showListCreate = ref(false)
 const listName = ref('')
-const lists = useStorage('lists', []) // this [] not reactive?
+const lists = useStorage('lists', [])
 const selectedLists = ref([])
 
 function createList(){
@@ -46,12 +46,12 @@ function createList(){
     listName.value = ''
     console.log(lists.value)
     showListCreate.value = false
-    useStorage('lists', lists,
-    {
-    mergeDefaults: (storageValue, defaults) =>
-      deepMerge(defaults, storageValue),
-    },
-    )
+    // useStorage('lists', lists,
+    // {
+    // mergeDefaults: (storageValue, defaults) =>
+    //   deepMerge(defaults, storageValue),
+    // },
+    // )
   // }
 }
 
@@ -63,12 +63,14 @@ function addToList(movie) {
     console.log(list)
   })
   visible.value = false
-  useStorage('lists', lists,
-  {
-    mergeDefaults: (storageValue, defaults) =>
-      deepMerge(defaults, storageValue),
-  },
-  )
+  //it updates lists in localStorage automatically
+
+  // useStorage('lists', lists,
+  // {
+  //   mergeDefaults: (storageValue, defaults) =>
+  //     deepMerge(defaults, storageValue),
+  // },
+  //)
 }
 
 </script>

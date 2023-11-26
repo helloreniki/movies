@@ -1,5 +1,5 @@
 <template>
-  <div v-if="my_lists" class="flex flex-col gap-2">
+  <div v-if="my_lists" class="flex flex-col gap-4">
     <div v-for="list in my_lists" :key="list" >
       <ListShow :list="list" />
     </div>
