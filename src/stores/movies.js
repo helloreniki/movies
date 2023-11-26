@@ -24,7 +24,6 @@ export const useMoviesStore = defineStore('movies', () => {
           .filter(movie => movie.genre.includes(selectedGenre.value))
           .sort((a, b) => {
             if(selectedSortOption.value.field == 'Title'){
-              console.log('sorting')
               if(selectedSortOption.value.direction == 'asc'){
 
                 if (a.title < b.title) { return -1 }
@@ -96,7 +95,7 @@ export const useMoviesStore = defineStore('movies', () => {
           'review': useStorage('review' + element.imdbID, null).value
         })
       });
-      console.log(movies.value)
+      // console.log(movies.value)
 
       totalMovies.value = totalResults
 
@@ -134,7 +133,7 @@ export const useMoviesStore = defineStore('movies', () => {
   }
 
   function updatePage(e) {
-    console.log(e)
+    // console.log(e)
     const first = e.first
     const last = first + e.rows
     paginatedMovies.value = filteredMovies.value.slice(first, last)

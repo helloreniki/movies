@@ -36,15 +36,11 @@ const lists = useStorage('lists', [])
 const selectedLists = ref([])
 
 function createList(){
-  // if(!lists.value.listName){
-    // console.log(listName.value)
-    // console.log(lists.value)
     lists.value.push({
       'name': listName.value,
       'movies': []
     })
     listName.value = ''
-    console.log(lists.value)
     showListCreate.value = false
     // useStorage('lists', lists,
     // {
@@ -56,11 +52,8 @@ function createList(){
 }
 
 function addToList(movie) {
-  console.log('movie', movie)
   selectedLists.value.forEach(list => {
-    console.log(list)
     list.movies.push(movie)
-    console.log(list)
   })
   visible.value = false
   //it updates lists in localStorage automatically

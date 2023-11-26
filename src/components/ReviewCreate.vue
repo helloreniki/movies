@@ -20,10 +20,8 @@ import { useStorage } from '@vueuse/core'
 
 
 const props = defineProps({movie: Object})
-
-const review = ref('')
 const visible = ref(false)
-console.log(props.movie)
+
 function addReview() {
   useStorage('review' + props.movie.id, props.movie.review)
   visible.value = false
